@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>群体决策案例分析——以三峡工程为例</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/*** BASE COLORS ***/
+:root {
+  --pr: #D4583A;      /* 柿红 */
+  --au: #D4A84B;      /* 金黄 */
+  --bl: #5B9BD5;      /* 天蓝 */
+  --dk: #1A3A5C;      /* 深蓝 */
+  --cr: #FAF8F5;       /* 暖白 */
+  --c:  #2D2D2D;      /* 炭黑 */
+  --g:  #6B7280;      /* 灰 */
+  --lg: #E5E7EB;       /* 浅灰 */
+  --gn: #2E7D32;      /* 绿 */
+  --yl: #F5A623;       /* 黄 */
+  --shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+
+/*** VIEWPORT LOCK ***/
+html, body { height: 100%; overflow-x: hidden; margin: 0; padding: 0; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+body { font-family: 'Noto Sans SC', sans-serif; background: var(--cr); color: var(--c); }
+
+/*** SLIDE BASE ***/
+.slide {
+  width: 100vw; height: 100vh; height: 100dvh;
+  overflow: hidden; scroll-snap-align: start;
+  display: flex; flex-direction: column;
+  position: relative; padding: clamp(1.5rem, 4vw, 3.5rem);
+}
+.slide-content {
+  flex: 1; display: flex; flex-direction: column;
+  justify-content: center; max-height: 100%; overflow: hidden;
+}
+.reveal { opacity: 0; transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease; }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.reveal:nth-child(2) { transition-delay: 0.1s; }
+.reveal:nth-child(3) { transition-delay: 0.2s; }
+.reveal:nth-child(4) { transition-delay: 0.3s; }
+.reveal:nth-child(5) { transition-delay: 0.4s; }
+
+/*** TYPOGRAPHY ***/
+h1 { font-family: 'Noto Serif SC', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; color: var(--dk); line-height: 1.2; margin: 0 0 1rem; }
+h2 { font-family: 'Noto Serif SC', serif; font-size: clamp(1.25rem, 3vw, 2rem); font-weight: 600; color: var(--dk); margin: 0 0 1.5rem; }
+h3 { font-size: clamp(1rem, 2vw, 1.35rem); font-weight: 600; color: var(--dk); }
+p, li { font-size: clamp(0.85rem, 1.5vw, 1.05rem); line-height: 1.7; color: var(--c); }
+
+/*** HEADER BAR ***/
+.header-bar {
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--pr) 0%, var(--au) 50%, var(--bl) 100%);
+}
+
+/*** NAV DOTS ***/
+.nav-dots { position: fixed; right: 1.5rem; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 0.5rem; }
+.nav-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lg); cursor: pointer; transition: all 0.3s; border: none; }
+.nav-dot.active { background: var(--pr); transform: scale(1.3); }
+.nav-dot:hover { background: var(--au); }
+
+/*** PROGRESS BAR ***/
+.progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: var(--pr); transition: width 0.3s ease; z-index: 100; }
+
+/*** FOOTER ***/
+.footer { position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem clamp(1.5rem, 4vw, 3.5rem); font-size: 0.8rem; color: var(--g); }
+.footer .page-num { font-weight: 600; color: var(--dk); }
+
+/*** CARDS ***/
+.card { background: white; border-radius: 12px; padding: clamp(1rem, 2vw, 1.5rem); box-shadow: var(--shadow); }
+.card-accent { border-left: 4px solid var(--pr); }
+.card-blue { border-top: 3px solid var(--bl); }
+.card-gold { border-top: 3px solid var(--au); }
+
+/*** STAT NUMBERS ***/
+.stat-card { background: var(--dk); color: white; border-radius: 12px; padding: 1.5rem; text-align: center; }
+.stat-num { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 700; color: var(--au); font-family: 'Noto Serif SC', serif; }
+.stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.8); margin-top: 0.3rem; }
+
+/*** BULLET LIST ***/
+.bullet-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+.bullet-list li { padding-left: 1.5rem; position: relative; }
+.bullet-list li::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 8px; height: 8px; border-radius: 50%; background: var(--pr); }
+
+/*** GRID ***/
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 1rem; }
+
+/*** TIMELINE ***/
+.timeline { display: flex; align-items: flex-start; gap: 0; position: relative; }
+.timeline::before { content: ''; position: absolute; top: 20px; left: 0; right: 0; height: 2px; background: var(--lg); }
+.timeline-item { flex: 1; text-align: center; position: relative; padding-top: 40px; }
+.timeline-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--pr); position: absolute; top: 12px; left: 50%; transform: translateX(-50%); border: 3px solid var(--cr); }
+.timeline-year { font-weight: 700; color: var(--pr); font-size: 0.9rem; margin-bottom: 0.3rem; }
+.timeline-title { font-weight: 600; color: var(--dk); font-size: 0.95rem; }
+
+/*** QUOTE ***/
+.quote { border-left: 4px solid var(--au); padding: 1rem 1.5rem; background: rgba(212,168,75,0.08); font-style: italic; font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.8; color: var(--dk); }
+
+/*** SECTION LABEL ***/
+.section-label { display: inline-block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pr); margin-bottom: 0.5rem; }
+
+/*** DIVIDER ***/
+.divider { height: 2px; background: linear-gradient(90deg, var(--pr), var(--au)); border-radius: 2px; margin: 1rem 0; }
+
+/*** DATA ROW ***/
+.data-row { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--lg); }
+.data-row:last-child { border-bottom: none; }
+.data-label { color: var(--g); font-size: 0.9rem; }
+.data-value { font-weight: 700; color: var(--dk); font-size: 1rem; }
+
+/*** VOTE DISPLAY ***/
+.vote-card { border-radius: 12px; padding: 1.5rem; text-align: center; color: white; }
+.vote-num { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 700; font-family: 'Noto Serif SC', serif; }
+.vote-label { font-size: 1rem; margin-top: 0.5rem; opacity: 0.9; }
+.vote-green { background: var(--gn); }
+.vote-red { background: var(--pr); }
+.vote-yellow { background: var(--yl); }
+
+/*** RESPONSIVE ***/
+@media (max-height: 700px) { .slide { padding: clamp(1rem, 2vw, 2rem); } }
+@media (max-height: 600px) { .nav-dots { display: none; } h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); } }
+@media (max-width: 768px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } .timeline { flex-direction: column; gap: 1rem; } .timeline::before { display: none; } .timeline-item { text-align: left; padding-top: 0; padding-left: 30px; } .timeline-dot { top: 0; left: 0; transform: none; } }
+
+/*** SLIDE BACKGROUNDS ***/
+.slide-covers { background: var(--cr); }
+.slide-light { background: white; }
+.slide-dark { background: var(--dk); color: white; }
+.slide-dark h1, .slide-dark h2, .slide-dark h3, .slide-dark p { color: white; }
+</style>
+</head>
+<body>
+
+<!-- NAV DOTS -->
+<nav class="nav-dots" id="navDots"></nav>
+<!-- PROGRESS -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- ========== SLIDE 1: 封面 ========== -->
+<section class="slide slide-covers" data-slide="1">
+  <div class="header-bar"></div>
+  <div class="slide-content" style="align-items:center;text-align:center;">
+    <div class="reveal">
+      <p class="section-label">群体决策案例分析</p>
+      <h1 style="font-size:clamp(2.2rem,6vw,4rem);margin-bottom:1.5rem;">以三峡工程决策过程为例</h1>
+      <p style="font-size:clamp(1rem,2vw,1.3rem);color:var(--g);margin-bottom:2rem;">一项跨越74年的重大工程决策深度研究</p>
+    </div>
+    <div class="reveal grid-4" style="max-width:800px;margin:0 auto;">
+      <div class="stat-card"><div class="stat-num">近百年</div><div class="stat-label">决策跨度</div></div>
+      <div class="stat-card"><div class="stat-num">412位</div><div class="stat-label">论证专家</div></div>
+      <div class="stat-card"><div class="stat-num">14份</div><div class="stat-label">专题报告</div></div>
+      <div class="stat-card"><div class="stat-num">1767票</div><div class="stat-label">人大赞成</div></div>
+    </div>
+  </div>
+  <div class="footer"><span>2026年4月</span><span class="page-num">01 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 2: 目录 ========== -->
+<section class="slide slide-light" data-slide="2">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <h2>目  录</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="reveal grid-2" style="gap:1rem;">
+      <div class="card card-accent" style="display:flex;align-items:center;gap:1rem;">
+        <div style="font-size:2rem;font-weight:700;color:var(--pr);font-family:'Noto Serif SC',serif;">01</div>
+        <div><h3 style="margin-bottom:0.3rem;">案例背景与研究价值</h3><p style="color:var(--g);font-size:0.9rem;">工程概况及选题意义</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;align-items:center;gap:1rem;">
+        <div style="font-size:2rem;font-weight:700;color:var(--pr);font-family:'Noto Serif SC',serif;">02</div>
+        <div><h3 style="margin-bottom:0.3rem;">决策过程的历史回顾</h3><p style="color:var(--g);font-size:0.9rem;">从设想到立项的四个阶段</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;align-items:center;gap:1rem;">
+        <div style="font-size:2rem;font-weight:700;color:var(--pr);font-family:'Noto Serif SC',serif;">03</div>
+        <div><h3 style="margin-bottom:0.3rem;">群体决策机制深度分析</h3><p style="color:var(--g);font-size:0.9rem;">四大核心特征解读</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;align-items:center;gap:1rem;">
+        <div style="font-size:2rem;font-weight:700;color:var(--pr);font-family:'Noto Serif SC',serif;">04</div>
+        <div><h3 style="margin-bottom:0.3rem;">实地调研与民意整合</h3><p style="color:var(--g);font-size:0.9rem;">100余人考察的组织与成效</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;align-items:center;gap:1rem;">
+        <div style="font-size:2rem;font-weight:700;color:var(--pr);font-family:'Noto Serif SC',serif;">05</div>
+        <div><h3 style="margin-bottom:0.3rem;">利益格局与制度设计</h3><p style="color:var(--g);font-size:0.9rem;">防洪、移民、生态补偿机制</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;align-items:center;gap:1rem;">
+        <div style="font-size:2rem;font-weight:700;color:var(--pr);font-family:'Noto Serif SC',serif;">06</div>
+        <div><h3 style="margin-bottom:0.3rem;">决策成效的历史检验</h3><p style="color:var(--g);font-size:0.9rem;">防洪、发电、航运、水资源</p></div>
+      </div>
+      <div class="card card-accent" style="display:flex;align-items:center;gap:1rem;grid-column:span 2;">
+        <div style="font-size:2rem;font-weight:700;color:var(--pr);font-family:'Noto Serif SC',serif;">07</div>
+        <div><h3 style="margin-bottom:0.3rem;">经验启示与理论价值</h3><p style="color:var(--g);font-size:0.9rem;">对群体决策理论的本土贡献</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">02 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 3: 案例背景 ========== -->
+<section class="slide slide-light" data-slide="3">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">01  案例背景</p>
+      <h2>三峡工程概况与研究价值</h2>
+    </div>
+    <div class="reveal grid-2" style="gap:1.5rem;margin-top:1rem;">
+      <div class="card">
+        <h3 style="color:var(--pr);margin-bottom:0.75rem;">工程概况</h3>
+        <p style="margin-bottom:1rem;">三峡工程是世界上规模最大的水利枢纽工程，坝高185米，正常蓄水位175米，总库容393亿立方米，防洪库容221.5亿立方米。</p>
+        <p style="margin-bottom:1rem;">水电站装机容量2250万千瓦，安装32台70万千瓦水轮发电机组，年发电量约1000亿度，是世界最大的清洁能源生产基地。</p>
+        <p>工程涉及湖北省、重庆市共19个区县，移民安置人口129.64万，动态总投资超过2000亿元，建设工期17年。</p>
+      </div>
+      <div class="card card-gold">
+        <h3 style="color:var(--au);margin-bottom:0.75rem;">研究价值</h3>
+        <ul class="bullet-list">
+          <li><strong>理论价值：</strong>为群体决策理论提供中国特色的本土案例，补充非西方语境下的决策理论素材</li>
+          <li><strong>实践价值：</strong>为重大工程决策提供可借鉴的制度设计参考，总结"科学决策、民主决策"的操作经验</li>
+          <li><strong>历史价值：</strong>记录改革开放后中国重大决策机制的演变过程</li>
+          <li><strong>比较价值：</strong>与美国胡佛大坝、埃及阿斯旺大坝等国际案例对照，凸显制度特色</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">03 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 4: 关键数据 ========== -->
+<section class="slide slide-covers" data-slide="4">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align:center;margin-bottom:1.5rem;">
+      <p class="section-label">01  关键数据</p>
+      <h2>三峡工程核心指标一览</h2>
+    </div>
+    <div class="reveal grid-4">
+      <div class="card">
+        <h3 style="color:var(--pr);font-size:1rem;margin-bottom:0.75rem;">工程规模</h3>
+        <div class="data-row"><span class="data-label">坝高</span><span class="data-value">185米</span></div>
+        <div class="data-row"><span class="data-label">蓄水位</span><span class="data-value">175米</span></div>
+        <div class="data-row"><span class="data-label">总库容</span><span class="data-value">393亿m³</span></div>
+        <div class="data-row"><span class="data-label">防洪库容</span><span class="data-value">221.5亿m³</span></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--bl);font-size:1rem;margin-bottom:0.75rem;">发电能力</h3>
+        <div class="data-row"><span class="data-label">装机容量</span><span class="data-value">2250万kW</span></div>
+        <div class="data-row"><span class="data-label">年发电量</span><span class="data-value">约1000亿度</span></div>
+        <div class="data-row"><span class="data-label">机组数量</span><span class="data-value">32台</span></div>
+        <div class="data-row"><span class="data-label">单机容量</span><span class="data-value">70万kW/台</span></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--au);font-size:1rem;margin-bottom:0.75rem;">移民安置</h3>
+        <div class="data-row"><span class="data-label">涉及区县</span><span class="data-value">19个</span></div>
+        <div class="data-row"><span class="data-label">淹没面积</span><span class="data-value">632km²</span></div>
+        <div class="data-row"><span class="data-label">移民总数</span><span class="data-value">129.64万</span></div>
+        <div class="data-row"><span class="data-label">外迁省份</span><span class="data-value">11个</span></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--dk);font-size:1rem;margin-bottom:0.75rem;">决策参与</h3>
+        <div class="data-row"><span class="data-label">论证专家</span><span class="data-value">412位</span></div>
+        <div class="data-row"><span class="data-label">参与单位</span><span class="data-value">65个</span></div>
+        <div class="data-row"><span class="data-label">论证报告</span><span class="data-value">14份</span></div>
+        <div class="data-row"><span class="data-label">赞成票</span><span class="data-value">1767票</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">04 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 5: 决策过程总览 ========== -->
+<section class="slide slide-light" data-slide="5">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">02  决策过程</p>
+      <h2>74年漫漫长路，四次关键转折</h2>
+    </div>
+    <div class="reveal timeline" style="margin:2rem 0;">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">1918—1950s</div>
+        <div class="timeline-title">设想萌芽</div>
+        <p style="font-size:0.8rem;color:var(--g);margin-top:0.3rem;">孙中山首提<br>毛泽东规划</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--bl);"></div>
+        <div class="timeline-year">1983—1986</div>
+        <div class="timeline-title">初步论证</div>
+        <p style="font-size:0.8rem;color:var(--g);margin-top:0.3rem;">150米低坝方案<br>引发激烈争议</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--au);"></div>
+        <div class="timeline-year">1986—1989</div>
+        <div class="timeline-title">重新论证</div>
+        <p style="font-size:0.8rem;color:var(--g);margin-top:0.3rem;">412位专家<br>14份专题报告</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--gn);"></div>
+        <div class="timeline-year">1990—1992</div>
+        <div class="timeline-title">全国人大</div>
+        <p style="font-size:0.8rem;color:var(--g);margin-top:0.3rem;">审议通过<br>正式立项</p>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="quote">三峡工程决策呈现出"长周期、多轮次、广参与"的显著特征。期间经历了从150米低坝到175米中坝的重大方案调整。这种"吵出来的决策"，是科学性和民主性并存的最佳诠释。</div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">05 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 6: 设想萌芽 ========== -->
+<section class="slide slide-covers" data-slide="6">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">02  阶段一</p>
+      <h2>设想萌芽（1918—1950年代）</h2>
+    </div>
+    <div class="reveal grid-3" style="margin-top:1.5rem;gap:1rem;">
+      <div class="card card-accent">
+        <h3 style="margin-bottom:0.5rem;">1918年</h3>
+        <p style="font-size:0.9rem;margin-bottom:0.75rem;color:var(--pr);font-weight:600;">孙中山《建国方略》</p>
+        <p style="font-size:0.9rem;">首次提出三峡工程设想："以水闸堰其水，使舟得溯流以行，而又可资其水力"。这是三峡工程最早的官方文献记载。</p>
+      </div>
+      <div class="card card-blue">
+        <h3 style="margin-bottom:0.5rem;">1956年</h3>
+        <p style="font-size:0.9rem;margin-bottom:0.75rem;color:var(--bl);font-weight:600;">毛泽东《水调歌头·游泳》</p>
+        <p style="font-size:0.9rem;">"更立西江石壁，截断巫山云雨，高峡出平湖，神女应无恙，当惊世界殊"。将三峡工程提升到民族复兴的象征高度。</p>
+      </div>
+      <div class="card card-gold">
+        <h3 style="margin-bottom:0.5rem;">1958年</h3>
+        <p style="font-size:0.9rem;margin-bottom:0.75rem;color:var(--au);font-weight:600;">南宁会议定调</p>
+        <p style="font-size:0.9rem;">"积极准备，充分可靠"八字方针，周恩来总理挂帅。这一阶段高层政治推动为主，技术论证尚不充分，为后来争议埋下伏笔。</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">06 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 7: 初步论证 ========== -->
+<section class="slide slide-light" data-slide="7">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">02  阶段二</p>
+      <h2>初步论证与争议（1983—1986年）</h2>
+    </div>
+    <div class="reveal grid-2" style="margin-top:1.5rem;gap:1.5rem;">
+      <div class="card">
+        <h3 style="color:var(--dk);margin-bottom:0.75rem;">低坝方案的提出</h3>
+        <p style="margin-bottom:1rem;">1983年，国家计委审查通过150米低坝方案。1984年4月，国务院初步确定实施。</p>
+        <p style="margin-bottom:0.5rem;"><strong>方案优势：</strong></p>
+        <ul class="bullet-list" style="gap:0.4rem;">
+          <li>尽量减少淹没面积</li>
+          <li>控制移民规模</li>
+          <li>降低投资压力</li>
+        </ul>
+      </div>
+      <div class="card" style="border-left:4px solid var(--pr);">
+        <h3 style="color:var(--pr);margin-bottom:0.75rem;">孙越崎的反对意见</h3>
+        <p style="margin-bottom:1rem;">93岁的全国政协常委孙越崎，率众实地考察后提交了《三峡工程近期不能上》的长篇调查报告。</p>
+        <p style="font-weight:600;color:var(--pr);margin-bottom:0.5rem;">五大质疑：</p>
+        <ul class="bullet-list" style="gap:0.3rem;">
+          <li>泥沙淤积将缩短水库寿命</li>
+          <li>诱发地震风险危及大坝安全</li>
+          <li>库区生态环境不可逆破坏</li>
+          <li>百万移民社会稳定压力</li>
+          <li>数百亿投资的国民经济负担</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">07 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 8: 重新论证 ========== -->
+<section class="slide slide-covers" data-slide="8">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal" style="text-align:center;margin-bottom:1.5rem;">
+      <p class="section-label">02  阶段三</p>
+      <h2>重新论证（1986—1989年）</h2>
+    </div>
+    <div class="reveal grid-4" style="margin-bottom:1.5rem;">
+      <div class="stat-card"><div class="stat-num">412</div><div class="stat-label">参与专家</div></div>
+      <div class="stat-card"><div class="stat-num">65</div><div class="stat-label">单位部门</div></div>
+      <div class="stat-card"><div class="stat-num">14</div><div class="stat-label">论证报告</div></div>
+      <div class="stat-card"><div class="stat-num">7</div><div class="stat-label">大本异议资料</div></div>
+    </div>
+    <div class="reveal">
+      <div class="card" style="margin-bottom:1rem;">
+        <p>面对激烈争议，党中央、国务院于1986年6月果断决定重新论证。从全国65个单位抽调412名专家，<strong style="color:var(--pr);">刻意吸收持不同意见的专家参与</strong>，将各反面意见印成7大本资料，人手一册，分发给全体专家讨论参考。</p>
+      </div>
+      <div class="card card-gold">
+        <p>经过近三年的深入论证，形成14个专题论证报告，覆盖地质地震、泥沙淤积、生态环境、移民安置、防洪效益、发电效益等所有关键领域。</p>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:1rem;">
+      <div class="quote" style="border-left-color:var(--pr);background:rgba(212,88,58,0.08);">
+        <strong>"三峡工程建比不建好，早建比晚建有利。"</strong><br>实施方案：中坝方案，坝高185米、蓄水位175米。
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">08 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 9: 人大审议 ========== -->
+<section class="slide slide-light" data-slide="9">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">02  阶段四</p>
+      <h2>全国人大审议与立项（1990—1992年）</h2>
+    </div>
+    <div class="reveal grid-3" style="margin:1.5rem 0;gap:1rem;">
+      <div class="vote-card vote-green"><div class="vote-num">1767</div><div class="vote-label">赞成票</div></div>
+      <div class="vote-card vote-red"><div class="vote-num">177</div><div class="vote-label">反对票</div></div>
+      <div class="vote-card vote-yellow"><div class="vote-num">664</div><div class="vote-label">弃权票</div></div>
+    </div>
+    <div class="reveal grid-2" style="gap:1rem;">
+      <div class="card">
+        <h3 style="color:var(--dk);margin-bottom:0.5rem;">里程碑意义</h3>
+        <p>1991年8月，国务院审查委员会通过可行性研究报告。1992年2月20日，中央政治局常委会决定提交全国人大审议。<strong>这是全国人大历史上首次就单一工程项目进行投票表决。</strong></p>
+      </div>
+      <div class="card card-accent">
+        <h3 style="color:var(--pr);margin-bottom:0.5rem;">程序正当性的证明</h3>
+        <p>赞成率约67%——这个数字意味深长：它不是"压倒性多数"，但恰恰证明了决策过程的充分民主性。<strong>反对票和弃权票的存在本身，就是对"程序正当"的最好注脚。</strong></p>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:1rem;text-align:center;">
+      <p style="color:var(--dk);font-weight:600;">1994年12月14日，三峡工程正式开工建设。</p>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">09 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 10: 广泛参与 ========== -->
+<section class="slide slide-covers" data-slide="10">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">03  群体决策机制分析</p>
+      <h2>特征一：广泛参与</h2>
+    </div>
+    <div class="reveal grid-2" style="margin-top:1.5rem;gap:1rem;">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+          <div style="width:40px;height:40px;background:var(--dk);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">1</div>
+          <div><h3 style="margin:0;">中央决策层</h3><p style="color:var(--g);font-size:0.85rem;">政治局常委会、全国人大</p></div>
+        </div>
+        <p>战略决策与最终审批把关</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+          <div style="width:40px;height:40px;background:var(--pr);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">2</div>
+          <div><h3 style="margin:0;">政府部门</h3><p style="color:var(--g);font-size:0.85rem;">国家计委、水利部、财政部等</p></div>
+        </div>
+        <p>组织协调、可行性审查、资源保障</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+          <div style="width:40px;height:40px;background:var(--bl);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">3</div>
+          <div><h3 style="margin:0;">专家学者</h3><p style="color:var(--g);font-size:0.85rem;">412位跨部门专家</p></div>
+        </div>
+        <p>技术攻关、方案评估、风险论证</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+          <div style="width:40px;height:40px;background:var(--au);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">4</div>
+          <div><h3 style="margin:0;">地方代表</h3><p style="color:var(--g);font-size:0.85rem;">鄂湘川三省及库区各区县</p></div>
+        </div>
+        <p>利益诉求表达、移民安置协调</p>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:1rem;">
+      <div class="quote" style="text-align:center;border-left:none;border-top:3px solid var(--dk);padding:1rem 1.5rem 1rem 0;">
+        "中央主导 + 专家论证 + 地方参与 + 群众表达"——四层协同的结构，既保证了决策效率，又确保了各方利益诉求的充分表达与回应。
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">10 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 11: 包容异议 ========== -->
+<section class="slide slide-light" data-slide="11">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">03  群体决策机制分析</p>
+      <h2>特征二：包容异议</h2>
+    </div>
+    <div class="reveal grid-2" style="margin-top:1.5rem;gap:1.5rem;">
+      <div class="card" style="border-left:4px solid var(--pr);">
+        <h3 style="color:var(--pr);margin-bottom:0.75rem;">反对意见的制度化表达</h3>
+        <p style="margin-bottom:1rem;">93岁的孙越崎率众实地考察后提交的长篇反对报告，系统阐述了五大质疑——泥沙淤积、地震风险、生态影响、移民压力、投资可行性。</p>
+        <p style="margin-bottom:0.75rem;">这份报告被<strong>如实提交给中央</strong>，异议没有被淡化或屏蔽。</p>
+        <p>在论证会上，一位80多岁的老专家代表三位年龄总和246岁的专家，明确表示不赞同近期建设。<strong>这段发言被完整记录</strong>，并印发给全体专家参考。</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--bl);">
+        <h3 style="color:var(--bl);margin-bottom:0.75rem;">回应质疑而非压制异议</h3>
+        <p style="margin-bottom:1rem;">最终决策没有简单地以"票数"压倒反对意见，而是<strong style="color:var(--pr);">针对每项质疑组织专项研究</strong>：</p>
+        <ul class="bullet-list">
+          <li>针对泥沙淤积 → 组织数学模型研究</li>
+          <li>针对地震风险 → 进行详细地质勘探</li>
+          <li>针对生态影响 → 制定保护系列方案</li>
+          <li>针对移民压力 → 设计长效安置机制</li>
+        </ul>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:1rem;">
+      <div class="quote" style="border-left-color:var(--au);background:rgba(212,168,75,0.06);">
+        "有反对、有回应、有调整"——这正是群体决策中<strong>"差异整合"</strong>的精髓：不是消除差异，而是在差异中发现更优解。
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">11 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 12: 科学支撑 ========== -->
+<section class="slide slide-covers" data-slide="12">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">03  群体决策机制分析</p>
+      <h2>特征三：科学支撑</h2>
+    </div>
+    <div class="reveal grid-4" style="margin:1.5rem 0;gap:0.75rem;">
+      <div class="stat-card" style="background:var(--bl);"><div class="stat-num" style="color:white;">数千名</div><div class="stat-label">科技人员</div></div>
+      <div class="stat-card" style="background:var(--au);"><div class="stat-num" style="color:white;">400+项</div><div class="stat-label">研究成果</div></div>
+      <div class="stat-card" style="background:var(--pr);"><div class="stat-num" style="color:var(--au);">14份</div><div class="stat-label">论证报告</div></div>
+      <div class="stat-card" style="background:var(--dk);"><div class="stat-num" style="color:var(--au);">7大本</div><div class="stat-label">异议资料</div></div>
+    </div>
+    <div class="reveal grid-2" style="gap:1rem;">
+      <div class="card">
+        <h3 style="color:var(--dk);margin-bottom:0.75rem;">14个专题覆盖领域</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;font-size:0.85rem;">
+          <span>• 地质地震安全评价</span><span>• 泥沙淤积预测</span>
+          <span>• 生态环境影响评估</span><span>• 移民安置方案</span>
+          <span>• 技术可行性研究</span><span>• 综合效益分析</span>
+          <span>• 投资经济评价</span><span>• 补偿标准制定</span>
+        </div>
+      </div>
+      <div class="card card-gold">
+        <h3 style="color:var(--au);margin-bottom:0.75rem;">"好处最大、坏处最小"</h3>
+        <p>这是三峡论证的核心准则。所有方案都经过了<strong>严格的量化比较</strong>，每个数字背后都有模型推演和实地数据的支撑。</p>
+        <p style="margin-top:0.75rem;font-weight:600;color:var(--dk);">"证据驱动"的决策模式，是群体决策区别于简单"少数服从多数"的关键标志。</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">12 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 13: 民主集中 ========== -->
+<section class="slide slide-light" data-slide="13">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">03  群体决策机制分析</p>
+      <h2>特征四：民主集中</h2>
+    </div>
+    <div class="reveal grid-2" style="margin-top:1.5rem;gap:1.5rem;">
+      <div class="card card-gold">
+        <h3 style="color:var(--au);margin-bottom:0.75rem;">民主：充分讨论阶段</h3>
+        <p style="margin-bottom:0.75rem;font-weight:600;color:var(--dk);">从1986年重新论证到1992年全国人大投票，"先民主后集中"：</p>
+        <ul class="bullet-list" style="gap:0.5rem;">
+          <li><strong>第1步（论证阶段）：</strong>鼓励不同意见表达和争论，允许公开辩论</li>
+          <li><strong>第2步（方案阶段）：</strong>组织多轮专家评审和方案比选</li>
+          <li><strong>第3步（上报阶段）：</strong>国务院审查通过后再提交人大</li>
+        </ul>
+        <p style="margin-top:0.75rem;">人大代表来自各地区、各行业，代表面极其广泛，为决策提供了充分的<strong>民主合法性基础</strong>。</p>
+      </div>
+      <div class="card card-accent">
+        <h3 style="color:var(--pr);margin-bottom:0.75rem;">集中：统一决策阶段</h3>
+        <p style="margin-bottom:0.75rem;">在充分讨论的基础上，最终由全国人大代表做出统一决策。虽然仍有177票反对、664票弃权，但<strong>一旦形成决议，各方都必须遵守和执行</strong>。</p>
+        <p style="font-weight:600;color:var(--dk);margin-bottom:0.5rem;">"民主基础上的集中"：</p>
+        <ul class="bullet-list" style="gap:0.3rem;">
+          <li>避免了"一言堂"的独断</li>
+          <li>避免了"议而不决"的拖沓</li>
+          <li>实现了质量与效率的统一</li>
+        </ul>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:1rem;text-align:center;">
+      <p style="font-size:1.1rem;font-weight:600;color:var(--dk);">三峡案例证明：民主集中制在重大工程决策中，可以实现质量与效率的统一。</p>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">13 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 14: 实地调研 ========== -->
+<section class="slide slide-covers" data-slide="14">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">04  实地调研</p>
+      <h2>民意整合与考察成效</h2>
+    </div>
+    <div class="reveal grid-2" style="margin-top:1.5rem;gap:1.5rem;">
+      <div class="card">
+        <h3 style="color:var(--dk);margin-bottom:0.75rem;">考察组织</h3>
+        <p style="margin-bottom:1rem;">在1992年全国人大审议前夕，国务院安排国家计委副主任甘子玉带队，组织了<strong style="color:var(--pr);">100多人</strong>的实地考察团。</p>
+        <p style="margin-bottom:0.75rem;">考察团成员包括：国务院各部委代表、各省（区、市）负责人、水利专家等，乘坐两条大船从重庆出发，沿江而下。</p>
+        <p>深入四川、湖北、湖南三省，实地查看库区淹没区、坝址工程区、下游受益区的实际情况，与当地干部群众面对面交流。</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--pr);">
+        <h3 style="color:var(--pr);margin-bottom:0.75rem;">调研成效</h3>
+        <ul class="bullet-list" style="gap:0.6rem;">
+          <li>亲眼看到了洞庭湖和江汉平原历年洪水留下的灾害遗迹</li>
+          <li>亲耳听到了沿岸居民关于洪水损失的血泪诉说</li>
+          <li>亲身感受到了群众对建设三峡大坝的强烈期盼</li>
+          <li style="color:var(--pr);font-weight:600;">对确定"防洪为主"的功能定位起到了核心作用</li>
+          <li style="color:var(--pr);font-weight:600;">对统一代表思想认识、促进投赞成票起到关键作用</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">14 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 15: 利益协调 ========== -->
+<section class="slide slide-light" data-slide="15">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">05  制度设计</p>
+      <h2>利益格局与协调机制</h2>
+    </div>
+    <div class="reveal" style="margin:1.5rem 0;">
+      <p style="color:var(--g);margin-bottom:1.5rem;text-align:center;">三峡工程涉及多重利益冲突：上下游、防洪与发电、工程建设与移民安置、短期与长期……</p>
+    </div>
+    <div class="reveal grid-2" style="gap:1rem;">
+      <div class="card" style="display:flex;gap:1rem;align-items:flex-start;">
+        <div style="width:48px;height:48px;background:var(--dk);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--au);font-size:1.5rem;font-weight:700;flex-shrink:0;">1</div>
+        <div><h3 style="margin-bottom:0.3rem;">防洪优先</h3><p style="font-size:0.9rem;">将防洪功能定位为首要目标。三峡大坝可将荆江河段防洪标准从十年一遇提升到百年一遇。</p></div>
+      </div>
+      <div class="card" style="display:flex;gap:1rem;align-items:flex-start;">
+        <div style="width:48px;height:48px;background:var(--pr);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.5rem;font-weight:700;flex-shrink:0;">2</div>
+        <div><h3 style="margin-bottom:0.3rem;">移民优先</h3><p style="font-size:0.9rem;">2005年成立后期扶持工作领导小组，解决"搬得出、稳得住、能致富"的问题。</p></div>
+      </div>
+      <div class="card" style="display:flex;gap:1rem;align-items:flex-start;">
+        <div style="width:48px;height:48px;background:var(--bl);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.5rem;font-weight:700;flex-shrink:0;">3</div>
+        <div><h3 style="margin-bottom:0.3rem;">生态补偿</h3><p style="font-size:0.9rem;">建立库区产业发展基金、后期扶持基金等优惠政策，平衡工程建设与生态保护。</p></div>
+      </div>
+      <div class="card" style="display:flex;gap:1rem;align-items:flex-start;">
+        <div style="width:48px;height:48px;background:var(--au);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.5rem;font-weight:700;flex-shrink:0;">4</div>
+        <div><h3 style="margin-bottom:0.3rem;">跨区域协调</h3><p style="font-size:0.9rem;">通过联席会议制度，协调20个省（自治区、直辖市）对口支援库区移民安置。</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">15 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 16: 成效一 ========== -->
+<section class="slide slide-covers" data-slide="16">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">06  决策成效</p>
+      <h2>历史检验（一）</h2>
+    </div>
+    <div class="reveal grid-2" style="margin-top:1.5rem;gap:1.5rem;">
+      <div class="card" style="border-top:4px solid var(--bl);">
+        <h3 style="color:var(--bl);margin-bottom:0.5rem;">防洪效益</h3>
+        <p style="font-size:1.1rem;font-weight:700;color:var(--dk);margin-bottom:0.75rem;">十年一遇 → 百年一遇</p>
+        <p style="margin-bottom:0.5rem;">三峡水库防洪库容221.5亿立方米，可将荆江河段防洪标准从十年一遇提高到百年一遇。</p>
+        <p style="margin-bottom:0.5rem;">2010年汛期削峰率约40%，滞蓄洪水264.3亿立方米。</p>
+        <p>截至2020年，累计拦洪总量<strong style="color:var(--pr);">超过1800亿立方米</strong>，彻底改变了长江中下游的防洪格局。</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--au);">
+        <h3 style="color:var(--au);margin-bottom:0.5rem;">发电效益</h3>
+        <p style="font-size:1.1rem;font-weight:700;color:var(--dk);margin-bottom:0.75rem;">2250万千瓦，世界第一</p>
+        <p style="margin-bottom:0.5rem;">年发电量约1000亿度，相当于5000万吨标准煤。</p>
+        <p style="margin-bottom:0.5rem;">为华东、华中、广东地区提供稳定清洁电力供应。</p>
+        <p>截至2020年，累计发电量达<strong style="color:var(--pr);">13541亿千瓦时</strong>，成为我国最重要的大型清洁能源生产基地。</p>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:1rem;text-align:center;">
+      <p style="font-weight:600;color:var(--dk);">综合效益：防洪 + 发电 + 航运 + 水资源调配 + 生态保护</p>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">16 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 17: 成效二 ========== -->
+<section class="slide slide-light" data-slide="17">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">06  决策成效</p>
+      <h2>历史检验（二）</h2>
+    </div>
+    <div class="reveal grid-2" style="margin-top:1.5rem;gap:1.5rem;">
+      <div class="card" style="border-top:4px solid var(--dk);">
+        <h3 style="color:var(--dk);margin-bottom:0.5rem;">航运效益</h3>
+        <p style="font-size:1.1rem;font-weight:700;color:var(--dk);margin-bottom:0.75rem;">万吨船队直达重庆</p>
+        <p style="margin-bottom:0.5rem;">库区航道等级从III级提高到I级标准，5000吨以上船舶成为主流。</p>
+        <p style="margin-bottom:0.5rem;">平均每年水上交通事故数下降了<strong style="color:var(--pr);">2/3</strong>。</p>
+        <p>截至2020年，累计过闸货运量<strong style="color:var(--pr);">14.83亿吨</strong>，2011年首次突破1亿吨，提前19年达到设计规划水平。</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--pr);">
+        <h3 style="color:var(--pr);margin-bottom:0.5rem;">水资源战略</h3>
+        <p style="font-size:1.1rem;font-weight:700;color:var(--dk);margin-bottom:0.75rem;">枯水季节补水200多亿立方米</p>
+        <p style="margin-bottom:0.5rem;">三峡水库具有165亿立方米兴利调节库容，是我国重要的淡水资源战略储备库。</p>
+        <p style="margin-bottom:0.5rem;">每年枯水季节为长江中下游补水200多亿立方米。</p>
+        <p>2011年干旱期间补水<strong style="color:var(--pr);">54.7亿立方米</strong>，被称为"抗旱及时雨"。</p>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:1rem;">
+      <div class="quote" style="text-align:center;border-left:none;border-top:3px solid var(--dk);padding:1rem 1.5rem 1rem 0;">
+        历史是最好的检验者——2003年蓄水发电至今，三峡工程交出了一份出色的答卷。
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">17 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 18: 经验启示 ========== -->
+<section class="slide slide-covers" data-slide="18">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">07  经验启示</p>
+      <h2>对群体决策理论的本土贡献</h2>
+    </div>
+    <div class="reveal grid-2" style="margin-top:1.5rem;gap:1rem;">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+          <div style="width:32px;height:32px;background:var(--pr);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">1</div>
+          <h3 style="margin:0;">共识构建先于决策</h3>
+        </div>
+        <p style="font-size:0.9rem;">重大工程决策需要经历充分的讨论、争论和说服过程，不能跳过共识构建阶段。三峡从争议到共识的转变，说明了"共识成本"是值得付出的。</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+          <div style="width:32px;height:32px;background:var(--bl);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">2</div>
+          <h3 style="margin:0;">包容异议而非消除异议</h3>
+        </div>
+        <p style="font-size:0.9rem;">反对意见是完善方案、降低风险的重要资源。制度化地吸收反对意见，有助于提高决策质量——三峡案例提供了有力证明。</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+          <div style="width:32px;height:32px;background:var(--au);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">3</div>
+          <h3 style="margin:0;">科学支撑不可或缺</h3>
+        </div>
+        <p style="font-size:0.9rem;">群体决策不等于少数服从多数，需要以科学证据为基础。"证据驱动"是科学决策的核心原则。</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+          <div style="width:32px;height:32px;background:var(--dk);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--au);font-weight:700;">4</div>
+          <h3 style="margin:0;">代表性与合法性</h3>
+        </div>
+        <p style="font-size:0.9rem;">全国人大审议机制为重大决策提供了代表性和民主合法性，使决策获得公众认可和执行基础。</p>
+      </div>
+    </div>
+    <div class="reveal" style="margin-top:1rem;">
+      <p style="font-weight:600;color:var(--dk);text-align:center;">三峡工程决策跨越近百年，充分说明了重大基础设施决策需要超越任期思维，以历史视野审视。</p>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">18 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 19: 理论贡献 ========== -->
+<section class="slide slide-light" data-slide="19">
+  <div class="header-bar"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <p class="section-label">07  理论贡献</p>
+      <h2>对群体决策理论的四大贡献</h2>
+    </div>
+    <div class="reveal" style="margin-top:1.5rem;">
+      <div class="grid-2" style="gap:1rem;">
+        <div class="card card-accent">
+          <h3 style="margin-bottom:0.5rem;">差异整合机制</h3>
+          <p style="font-size:0.9rem;">证明了"包容异议"而非"消除差异"是群体决策有效运行的关键。孙越崎反对报告被如实上报、80多岁老专家的246岁发言被完整记录——为"差异整合"理论提供了中国经验。</p>
+        </div>
+        <div class="card card-blue">
+          <h3 style="margin-bottom:0.5rem;">证据-程序双轨模型</h3>
+          <p style="font-size:0.9rem;">揭示了重大决策需同时满足"科学证据充分"（14份论证报告）和"程序民主合法"（全国人大审议）两个条件，两个条件缺一不可。</p>
+        </div>
+        <div class="card card-gold">
+          <h3 style="margin-bottom:0.5rem;">长周期决策的组织模式</h3>
+          <p style="font-size:0.9rem;">提供了跨越多届领导班子的重大工程决策如何保持连续性的制度经验——关键在于档案记录的完整传承、论证结论的书面固化、以及"重新论证"触发机制。</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--dk);">
+          <h3 style="margin-bottom:0.5rem;">层级-广泛性悖论的解决</h3>
+          <p style="font-size:0.9rem;">证明了在大型社会中，通过"代表广泛性（全国人大）+ 层级集中（中央统筹）"的组合，可以实现既民主又有效的重大决策——对西方选举民主范式的重要补充。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span></span><span class="page-num">19 / 20</span></div>
+</section>
+
+<!-- ========== SLIDE 20: 参考资料 ========== -->
+<section class="slide slide-dark" data-slide="20">
+  <div class="header-bar" style="background:linear-gradient(90deg,var(--pr),var(--au),var(--bl));"></div>
+  <div class="slide-content">
+    <div class="reveal">
+      <h2 style="color:white;margin-bottom:1.5rem;">参考资料与数据来源</h2>
+    </div>
+    <div class="reveal" style="flex:1;overflow:hidden;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.85rem;color:rgba(255,255,255,0.8);max-height:100%;overflow-y:auto;">
+        <span>1. 环球时报，《工程院院士：建三峡大坝是决策民主化典范》</span>
+        <span>2. 国家发展和改革委员会，《三峡工程——承载着几代人梦想的世纪工程》，高俊才</span>
+        <span>3. 中国经济网，《转变经济增长方式的重要探索》</span>
+        <span>4. 中国水利网，《高峡出平湖当惊世界殊》</span>
+        <span>5. 《三峡工程论证报告》（1989年），三峡工程论证领导小组</span>
+        <span>6. 《关于兴建长江三峡工程的决议》（1992年），第七届全国人大五次会议</span>
+        <span>7. 《长江三峡水利枢纽可行性研究报告（审议稿）》（1989年）</span>
+        <span></span>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:1rem;">
+      <h1 style="color:var(--au);font-size:clamp(1.5rem,4vw,2.5rem);">谢谢观看</h1>
+    </div>
+  </div>
+  <div class="footer" style="border-top:1px solid rgba(255,255,255,0.2);"><span style="color:rgba(255,255,255,0.6);"></span><span class="page-num" style="color:var(--au);">20 / 20</span></div>
+</section>
+
+<script>
+// Navigation
+const slides = document.querySelectorAll('.slide');
+const navDots = document.getElementById('navDots');
+const progressBar = document.getElementById('progressBar');
+
+// Create nav dots
+slides.forEach((_, i) => {
+  const dot = document.createElement('button');
+  dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+  dot.addEventListener('click', () => slides[i].scrollIntoView({ behavior: 'smooth' }));
+  navDots.appendChild(dot);
+});
+
+// Intersection Observer for .visible class
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      const idx = [...slides].indexOf(entry.target);
+      document.querySelectorAll('.nav-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === idx);
+      });
+      progressBar.style.width = ((idx + 1) / slides.length * 100) + '%';
+    }
+  });
+}, { threshold: 0.5 });
+
+slides.forEach(s => observer.observe(s));
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  const current = [...slides].findIndex(s => s.classList.contains('visible'));
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    slides[Math.min(current + 1, slides.length - 1)].scrollIntoView({ behavior: 'smooth' });
+  } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    slides[Math.max(current - 1, 0)].scrollIntoView({ behavior: 'smooth' });
+  }
+});
+</script>
+</body>
+</html>
