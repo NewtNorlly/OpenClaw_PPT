@@ -2,14 +2,14 @@
 > **从入门到学废 🚀**
 
 <p align="center">
-  <img src="https://s1.aigei.com/src/img/gif/01/01b2cd769a5041a4bc6c3b00b045ed88.gif?imageMogr2/auto-orient/thumbnail/!600x600r/gravity/Center/crop/600x600/quality/100/%7CimageView2/2/w/600&e=2051020800&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:4uX3pO1PI2QtG3-Yb28Sk5y9prE=" width="400"/>
-</p>
-
-<p align="center">
   🎉 欢迎来到 OpenClaw 的世界 · 一个属于 AI Agent 的新时代 🤖
 </p>
 
 ---
+
+<p align="center">
+  <img src="https://s1.aigei.com/src/img/gif/01/01b2cd769a5041a4bc6c3b00b045ed88.gif?imageMogr2/auto-orient/thumbnail/!282x282r/gravity/Center/crop/282x282/quality/85/%7CimageView2/2/w/282&e=2051020800&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:4uX3pO1PI2QtG3-Yb28Sk5y9prE=" width="320"/>
+</p>
 
 ## ✨ 项目简介
 OpenClaw 是一个**开源 + 自托管**的 AI Agent 系统，  
