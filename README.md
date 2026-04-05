@@ -1,6 +1,14 @@
 # 🦞 OpenClaw 橙皮书 · 梗概指南  
 > **从入门到学废 🚀**
 
+<p align="center">
+  <img src="https://s1.aigei.com/src/img/gif/01/01b2cd769a5041a4bc6c3b00b045ed88.gif?imageMogr2/auto-orient/thumbnail/!600x600r/gravity/Center/crop/600x600/quality/100/%7CimageView2/2/w/600&e=2051020800&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:4uX3pO1PI2QtG3-Yb28Sk5y9prE=" width="400"/>
+</p>
+
+<p align="center">
+  🎉 欢迎来到 OpenClaw 的世界 · 一个属于 AI Agent 的新时代 🤖
+</p>
+
 ---
 
 ## ✨ 项目简介
@@ -14,11 +22,6 @@ OpenClaw 是一个**开源 + 自托管**的 AI Agent 系统，
 - 🧩 **适用版本**：v2026.3.8  
 - 🕒 **发布时间**：2026年03月12日（构建 #3）  
 - 📚 **信息来源**：官方文档 / GitHub / 社区调研  
-
----
-
-## 🎉 欢迎动画
-![彩带礼炮](https://s1.aigei.com/src/img/gif/01/01b2cd769a5041a4bc6c3b00b045ed88.gif?imageMogr2/auto-orient/thumbnail/!282x282r/gravity/Center/crop/282x282/quality/85/%7CimageView2/2/w/282&e=2051020800&token=P7S2Xpzfz11vAkASLTkfHN7Fw-oOZBecqeJaxypL:4uX3pO1PI2QtG3-Yb28Sk5y9prE=)
 
 ---
 
@@ -56,7 +59,8 @@ OpenClaw 是一个 AI Agent 平台，可以：
 ---
 
 # 02. 技术架构 🏗️
-采用 **Gateway - Node - Channel 三层架构**：
+
+采用 **Gateway - Node - Channel 三层架构**
 
 ### 🔧 核心组件
 - 🧭 **Gateway**：控制中心（Session + 调度）  
@@ -71,92 +75,125 @@ OpenClaw 是一个 AI Agent 平台，可以：
 
 # 03. 部署方案 🚀
 
-### 📌 支持方式
 - 💻 **本地部署**：完全掌控数据  
 - 📦 **Docker**：环境隔离  
-- ☁️ **云部署**：一键上线（阿里云 / 腾讯云）  
+- ☁️ **云部署**：一键上线  
 
 ---
 
 # 04. 渠道接入 📡
 
 ### 🌍 国际平台
-- WhatsApp  
-- Telegram  
-- Discord  
+WhatsApp / Telegram / Discord  
 
 ### 🇨🇳 国内平台
-- 飞书  
-- 钉钉  
-- 企业微信  
+飞书 / 钉钉 / 企业微信  
 
 ---
 
 # 05. Skills 系统 🧩
 
-### 🌟 核心能力
-- 📦 **技能生态**：13,700+ Skills  
-- 🛠️ **自定义技能开发支持**  
-- 🛒 **ClawHub 技能市场**
+- 📦 **13,700+ 技能生态**  
+- 🛠️ **支持自定义开发**  
+- 🛒 **ClawHub 市场**  
 
 ---
 
 # 06. 模型配置 🧠
 
-- 🌐 **支持模型**
-  - Claude  
-  - GPT  
-  - DeepSeek  
-  - Gemini  
-
-- 🏠 **本地模型支持**
-  - 私有部署  
-  - 性能优化建议  
+- Claude / GPT / DeepSeek / Gemini  
+- 支持本地模型部署  
 
 ---
 
 # 07. 安全与成本 🔐💰
 
-- 🛡️ **安全机制**：多层防护防止数据泄露  
-- 📉 **成本控制**：精细化 Token 管理  
+- 🛡️ 多层安全机制  
+- 📉 Token 成本控制  
 
 ---
 
 # 08. 生态与社区 🌱
 
-- 🦞 **社区文化**：「养虾文化」  
-- 🤝 **生态合作**：工具 / 平台 / 硬件支持  
+- 🦞 “养虾文化”  
+- 🤝 开放生态合作  
 
 ---
 
 # 🎮 趣味彩蛋
 
-## 🧘 工作间隙
-![摸鱼一下](https://i1.hdslb.com/bfs/new_dyn/1659535f66e75c25d0aa216ec6f4b6fd628576425.gif@264w_264h_1e_1c.webp)
+## 🧘 摸鱼专区
+<p align="center">
+  <img src="https://i1.hdslb.com/bfs/new_dyn/1659535f66e75c25d0aa216ec6f4b6fd628576425.gif@264w_264h_1e_1c.webp" width="200"/>
+</p>
 
-> 适度摸鱼，提高效率 😎
+<p align="center">适度摸鱼，提高效率 😎</p>
 
 ---
 
 ## 🦞 仓库主人状态
-![状态](https://i1.hdslb.com/bfs/new_dyn/15f95d18b0503a2c07c04794427d128b628576425.gif@264w_264h_1e_1c.webp)
+<p align="center">
+  <img src="https://i1.hdslb.com/bfs/new_dyn/15f95d18b0503a2c07c04794427d128b628576425.gif@264w_264h_1e_1c.webp" width="200"/>
+</p>
 
-> 写代码：🙂 → 😐 → 😵 → 🤡
+<p align="center">🙂 → 😐 → 😵 → 🤡</p>
 
 ---
 
-## 📜 隐藏诗词彩蛋（修复版）
-```json
-{
-  "title": "马上口占",
-  "id": "cf3e11e9-85b5-4699-86f4-f8607eba9f96",
-  "author": "赵汝鐩",
-  "paragraphs": [
-    "夜雨晓方歇，薄雾随征车。",
-    "乔松二十里，翠微三五家。",
-    "双燕教群雏，一牛驮两鸦。",
-    "故人不可见，回首天之涯。"
-  ]
-}
+## 📜 隐藏剧情 ·「有诗一首」
+
+> 🧭 你在系统深处，发现了一段未被索引的数据……  
+> 📦 解码完成：疑似一封来自“旧时代”的书信
+
+---
+
+<div align="center">
+
+╭──────────────────────────────╮  
+│                              │  
+│        🏮 书 · 信 · 展 · 开 🏮        │  
+│                              │  
+╰──────────────────────────────╯  
+
+</div>
+
+<br>
+
+<div align="center">
+
+**《马上口占》**  
+*—— 赵汝鐩*
+
+<br>
+
+夜雨晓方歇，  
+薄雾随征车。  
+
+乔松二十里，  
+翠微三五家。  
+
+双燕教群雏，  
+一牛驮两鸦。  
+
+故人不可见，  
+回首天之涯。  
+
+</div>
+
+<br>
+
+---
+
+<div align="center">
+
+📮 **信件元数据（残缺）**
+
+</div>
+
+```yaml
+id: cf3e11e9-85b5-4699-86f4-f8607eba9f96
+type: 古典文本片段
+状态: 已归档
+来源: 未知节点
 
 
