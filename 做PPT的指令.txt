@@ -1,0 +1,227 @@
+@飞书虾
+帮我安装这个技能Frontend Slides
+A Claude Code skill for creating stunning, animation-rich HTML presentations — from scratch or by converting PowerPoint files.
+
+What This Does
+Frontend Slides helps non-designers create beautiful web presentations without knowing CSS or JavaScript. It uses a "show, don't tell" approach: instead of asking you to describe your aesthetic preferences in words, it generates visual previews and lets you pick what you like.
+
+Here is a deck about the skill, made through the skill:
+
+ Frontend.slides.demo.-.compressed.mp4 
+Key Features
+Zero Dependencies — Single HTML files with inline CSS/JS. No npm, no build tools, no frameworks.
+Visual Style Discovery — Can't articulate design preferences? No problem. Pick from generated visual previews.
+PPT Conversion — Convert existing PowerPoint files to web, preserving all images and content.
+Anti-AI-Slop — Curated distinctive styles that avoid generic AI aesthetics (bye-bye, purple gradients on white).
+Production Quality — Accessible, responsive, well-commented code you can customize.
+Installation
+For Claude Code Users
+Copy the skill files to your Claude Code skills directory:
+
+# Create the skill directory
+mkdir -p ~/.claude/skills/frontend-slides/scripts
+
+# Copy all files (or clone this repo directly)
+cp SKILL.md STYLE_PRESETS.md viewport-base.css html-template.md animation-patterns.md ~/.claude/skills/frontend-slides/
+cp scripts/extract-pptx.py ~/.claude/skills/frontend-slides/scripts/
+Or clone directly:
+
+git clone https://github.com/zarazhangrui/frontend-slides.git ~/.claude/skills/frontend-slides
+Then use it by typing /frontend-slides in Claude Code.
+
+Usage
+Create a New Presentation
+/frontend-slides
+
+> "I want to create a pitch deck for my AI startup"
+The skill will:
+
+Ask about your content (slides, messages, images)
+Ask about the feeling you want (impressed? excited? calm?)
+Generate 3 visual style previews for you to compare
+Create the full presentation in your chosen style
+Open it in your browser
+Convert a PowerPoint
+/frontend-slides
+
+> "Convert my presentation.pptx to a web slideshow"
+The skill will:
+
+Extract all text, images, and notes from your PPT
+Show you the extracted content for confirmation
+Let you pick a visual style
+Generate an HTML presentation with all your original assets
+Included Styles
+Dark Themes
+Bold Signal — Confident, high-impact, vibrant card on dark
+Electric Studio — Clean, professional, split-panel
+Creative Voltage — Energetic, retro-modern, electric blue + neon
+Dark Botanical — Elegant, sophisticated, warm accents
+Light Themes
+Notebook Tabs — Editorial, organized, paper with colorful tabs
+Pastel Geometry — Friendly, approachable, vertical pills
+Split Pastel — Playful, modern, two-color vertical split
+Vintage Editorial — Witty, personality-driven, geometric shapes
+Specialty
+Neon Cyber — Futuristic, particle backgrounds, neon glow
+Terminal Green — Developer-focused, hacker aesthetic
+Swiss Modern — Minimal, Bauhaus-inspired, geometric
+Paper & Ink — Literary, drop caps, pull quotes
+Architecture
+This skill uses progressive disclosure — the main SKILL.md is a concise map (~180 lines), with supporting files loaded on-demand only when needed:
+
+File	Purpose	Loaded When
+SKILL.md	Core workflow and rules	Always (skill invocation)
+STYLE_PRESETS.md	12 curated visual presets	Phase 2 (style selection)
+viewport-base.css	Mandatory responsive CSS	Phase 3 (generation)
+html-template.md	HTML structure and JS features	Phase 3 (generation)
+animation-patterns.md	CSS/JS animation reference	Phase 3 (generation)
+scripts/extract-pptx.py	PPT content extraction	Phase 4 (conversion)
+scripts/deploy.sh	Deploy to Vercel	Phase 6 (sharing)
+scripts/export-pdf.sh	Export slides to PDF	Phase 6 (sharing)
+This design follows OpenAI's harness engineering principle: "give the agent a map, not a 1,000-page instruction manual."
+
+Philosophy
+This skill was born from the belief that:
+
+You don't need to be a designer to make beautiful things. You just need to react to what you see.
+
+Dependencies are debt. A single HTML file will work in 10 years. A React project from 2019? Good luck.
+
+Generic is forgettable. Every presentation should feel custom-crafted, not template-generated.
+
+Comments are kindness. Code should explain itself to future-you (or anyone else who opens it).
+
+Sharing Your Presentations
+After creating a presentation, the skill offers two ways to share it:
+
+Deploy to a Live URL
+One command deploys your slides to a permanent, shareable URL that works on any device — phones, tablets, laptops:
+
+bash scripts/deploy.sh ./my-deck/
+# or
+bash scripts/deploy.sh ./presentation.html
+Uses Vercel (free tier). The skill walks you through signup and login if it's your first time.
+
+Export to PDF
+Convert your slides to a PDF for email, Slack, Notion, or printing:
+
+bash scripts/export-pdf.sh ./my-deck/index.html
+bash scripts/export-pdf.sh ./presentation.html ./output.pdf
+Uses Playwright to screenshot each slide at 1920×1080 and combine into a PDF. Installs automatically if needed. Animations are not preserved (it's a static snapshot).
+
+Requirements
+Claude Code CLI
+For PPT conversion: Python with python-pptx library
+For URL deployment: Node.js + Vercel account (free)
+For PDF export: Node.js (Playwright installs automatically)
+Credits
+Created by @zarazhangrui with Claude Code.
+
+Inspired by the "Vibe Coding" philosophy — building beautiful things without being a traditional software engineer.
+
+License
+MIT — Use it, modify it, share it.
+
+
+
+@档案虾 
+接着请你认真学习这个档案"C:\Users\NewtN\下载\OpenClaw橙皮书-从入门到精通-v1.2.0.pdf"
+把你的学习经验分享给键盘虾，@键盘虾 
+
+
+
+@冲浪虾，接着请你访问这四个网页，都能访问的！
+围绕“群体决策”这个主题，做一个案例分析word，保存到本地"C:\Users\NewtN\Desktop"中
+https://china.huanqiu.com/article/9CaKrnJrdlo
+https://www.ndrc.gov.cn/xwdt/gdzt/cl70zn/201909/t20190930_1197749_ext.html
+http://www.ce.cn/xwzx/gnsz/szyw/200706/17/t20070617_11787771.shtml
+https://www.chinawater.com.cn/syxg/dtxw/202011/t20201103_997104.html
+最后提醒一下键盘虾，让他准备工作了！@键盘虾
+
+
+
+@飞书虾
+安装一下这个技能"C:\Users\NewtN\下载\pdf-0.1.0"
+
+
+
+@键盘虾
+调用这两个技能frontend-slides和pdf
+选择一个政府工作报告的风格，将"C:\Users\NewtN\Desktop\群体决策案例分析_三峡工程.docx"做成一个PPT！
+最后保存到本地"C:\Users\NewtN\Desktop"中
+
+
+
+@键盘虾
+我让你调用这个技能frontend-slides和pdf来做。把内容写多一点，写充实一点，运用chinese这个技能！
+其次那个PPT，你是要理解整合成做一个20页的PPT，你怎么直接把人家内容数据粘过来呀？你动不动点脑子行不行？
+再次，那个PPT的风格是要求政府工作报告风格，但这也是案例分析啊，又不是党政宣传，你搞那么多红色干嘛！臭贝塔！你再搞不定，我把你拔了，你信不信把你token给你关了！
+
+
+
+所以，你保存到哪了？@键盘虾
+
+
+
+@键盘虾
+删掉你刚做的"C:\Users\NewtN\Desktop\group_decision_20slides.pptx"！看到桌面上的PPT"C:\Users\NewtN\Desktop\群体决策案例分析_三峡工程.pptx"没，在这个基础上修改！！！
+1、调用chinese技能，把文本内容写充实一点
+2、调用frontend-slides，我要的是政府工作报告兼具学术案例分析的风格，不能只搞党政红色
+3、调用pdf功能，学习技能里面的优秀经验，把正在修改的PPT格式改善一下！
+4、不要废话，做好了也还是保存到桌面，最后喊我一声就行！
+
+
+
+@灵感虾
+删掉"C:\Users\NewtN\Desktop\群体决策案例分析_三峡工程.pptx"
+你也学习一下这三个技能frontend-slides、pdf、chinese
+接着请你：
+1、调用chinese技能，把"C:\Users\NewtN\Desktop\群体决策案例分析_三峡工程.docx"文本内容写充实一点
+2、调用frontend-slides，根据"C:\Users\NewtN\Desktop\群体决策案例分析_三峡工程.docx"的内容做PPT
+我要的是学术案例分析的风格，不能搞党政红色，最好是柿红色、金黄色、天蓝色这三个主色调
+3、调用pdf功能，学习技能里面的优秀经验，把正在修改的PPT格式改善一下！
+4、不要废话，做好了也还是保存到桌面，最后喊我一声就行！
+
+
+
+@灵感虾
+算了，删掉"C:\Users\NewtN\Desktop\群体决策案例分析_三峡工程.pptx"
+直接按照frontend-slides里面的技能重新搞吧！
+做好了通知我就行！
+
+
+
+@灵感虾
+其实你做的很棒，现在把这个文件"C:\Users\NewtN\Desktop\群体决策案例分析_三峡工程.html"转换成PPT好吗？
+也是另存到桌面！
+
+
+
+@飞书虾
+安装这个技能"C:\Users\NewtN\下载\html-ppt-generator-1.0.1"
+
+
+
+@飞书虾
+学习技能html-ppt-generator-1.0.1
+将文件"C:\Users\NewtN\Desktop\群体决策案例分析_三峡工程.html"转换成PPT
+不要废话，做完了直接保存到桌面上，通知我就行！
+
+
+
+@飞书虾
+你已经做得很不错了，现在有个小细节，就是将"C:\Users\NewtN\Desktop\群体决策案例分析_三峡工程.pptx"里的最小正文字体修改为16号，直接在文件本身修改字号就行，修改好了告诉我就行！
+
+
+
+@档案虾
+请你深度学习一下上下文的指令，还有研究一下桌面上的两个文件
+把这次的项目经验，保存到记忆库中，还有关于每个小龙虾的人格仓库，也要丰富一下内容！
+
+
+
+只有六个小龙虾：本地虾，飞书虾，键盘虾，灵感虾，冲浪虾，档案虾！
+人格你给我更新没？@档案虾
+
+
